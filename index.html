@@ -1,0 +1,3238 @@
+
+<html>
+<head>
+  <base href>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Festa de Aniversário - Isa</title>
+  <link href="https://fonts.googleapis.com/css2?family=Satisfy&amp;display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100vw;
+      background: url('https://i.ibb.co/W2LB0X9/09f8b2c2-45e8-4eef-aa15-924b69e8ef8c.jpg') no-repeat center center;
+      background-size: cover;
+      transition: background-image 1s ease;
+    }
+
+    #game-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    #dialogue-box {
+      width: 90%;
+      background: rgba(0, 0, 0, 0.8); 
+      color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      position: absolute;
+      bottom: 15%;  
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      z-index: 1000;
+    }
+
+    #choices-container {
+      display: none;
+      width: 90%;
+      position: absolute;
+      bottom: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      gap: 10px;
+      flex-direction: column;
+    }
+
+    .choice-btn {
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border: 2px solid white;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: transform 0.2s;
+    }
+
+    .choice-btn:hover {
+      transform: scale(1.02);
+    }
+
+    #character-name {
+      font-weight: bold;
+      color: #9370DB;
+    }
+
+    #character-sprite {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 85vh;
+    }
+
+    #gift-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #gift-box {
+      display: none;
+      width: 200px;
+      height: 200px;
+      background: #888888;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    #gift-box:hover {
+      transform: scale(1.05); 
+    }
+
+    #gift-image {
+      display: none;
+      max-width: 90%;
+      max-height: 90vh;
+      position: relative;
+      border-radius: 10px;
+    }
+
+    #close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 2001;
+      padding: 5px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+    }
+
+    #close-button:hover {
+      background: rgba(0,0,0,0.8);
+    }
+
+    .gift-container {
+      position: relative;
+    }
+
+    .navigation-button {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      z-index: 1001;
+      transition: transform 0.3s ease;
+    }
+
+    .navigation-button img {
+      width: 60px;
+      height: auto;
+    }
+
+    .navigation-button:hover {
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .button-tooltip {
+      position: absolute;
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-right: 10px;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .navigation-button:hover .button-tooltip {
+      opacity: 1;
+    }
+
+    #letter-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #letter-content {
+      font-family: 'Satisfy', cursive;
+      font-size: 1.2em;
+      line-height: 1.5;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 80%;
+      position: relative;
+      white-space: pre-line;
+    }
+
+    @media (max-width: 768px) {
+      #dialogue-box, #choices-container {
+        width: 95%;
+        font-size: 1rem;
+        bottom: 15%;  
+        padding: 12px;
+      }
+      
+      #character-sprite {
+        height: 60vh;
+      }
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const bgmPlayer = new Audio('/ssstik.io_1765144718253.mp3 (1).mp4');
+      bgmPlayer.loop = true;
+      bgmPlayer.volume = 0.3; // Low volume as requested
+      
+      const doorSlamSFX = new Audio('/ssstik.io_1765156318710.mp3.mp4');
+      doorSlamSFX.loop = false;
+      doorSlamSFX.volume = 0.8; // Standard volume for an effect
+
+      const streetFightSFX = new Audio('/ssstik.io_1765215718143.mp3.mp4');
+      streetFightSFX.loop = false;
+      streetFightSFX.volume = 0.8;
+
+      const perfectSFX = new Audio('/mlg-resource-street-fighter-ko-greenscreen.mp3');
+      perfectSFX.loop = false;
+      perfectSFX.volume = 0.9;
+
+      // shoryuken SFX for Armin's line (play only once)
+      const shoryukenSFX = new Audio('/ken-s-shoryken.mp3');
+      shoryukenSFX.loop = false;
+      shoryukenSFX.volume = 0.9;
+      
+      const chunLiSFX = new Audio('/chun-li-say-ya.mp3');
+      chunLiSFX.loop = false;
+      chunLiSFX.volume = 0.9;
+
+      const alexySFX = new Audio('/a570beaf17ea7e6ab2dac957866f9b6c2 (2).mp3');
+      alexySFX.loop = false;
+      alexySFX.volume = 1.0;
+
+      const beatSFX = new Audio('/O Melhor Beat para Rimar e Batalha de Rima 🎤🔥 [dO2FjUWViII].mp3');
+      beatSFX.loop = false;
+      beatSFX.volume = 0.7;
+      
+      const kitchenDialogues = [{
+        name: "Nathaniel",
+        text: "Pensei que você poderia usar para seus escritos. Sei que tem interesse em literatura.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png",
+        background: "https://i.ibb.co/Gn8JZdv/3d21764041e4ad2c729d542a328f2cdc.jpg"
+      }, {
+        name: "Rosalya",
+        text: "Que capa linda!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      }, {
+        name: "Castiel",
+        text: "Uau, que...original",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Nathaniel",
+        text: "Alguma objeção ao meu presente?",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Castiel",
+        text: "Objeção? Por que eu teria uma objeção? Só acho engraçado como você sempre aparece querendo impressionar.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Nathaniel",
+        text: "Impressionar? Interessante perspectiva Castiel.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/8Lb5Ptz4/61-Sem-T-tulo-20250614095434.png"
+      }, {
+        name: "Nathaniel",
+        text: "Talvez você devesse tentar se esforçar mais também.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Priya",
+        text: "Pessoal...",
+        nameColor: "#9AFFFF",
+        sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+      }, {
+        name: "Castiel",
+        text: "Tch! Sempre com essa sua superioridade, né?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Nathaniel",
+        text: "Não é superioridade, Castiel. É apenas maturidade.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Isa",
+        text: "(Claro que eles tinham que transformar tudo em uma batalha de egos.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Parabéns pra mim, né? A estrela da festa completamente ignorada porque dois caras não conseguem superar o passado)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Nina aparece correndo com o celular na mão)",
+        sprite: "https://i.ibb.co/ymjdBbLf/214-2b72c9cde980a344.png"
+      }, {
+        name: "Isa",
+        text: "(Finalmente... alguém pra acabar com essa palhaçada)",
+        sprite: "https://i.ibb.co/cht2Gkgs/212-55913975438e96de.png"
+      }, {
+        name: "Nina",
+        text: "Gente! Consegui umas fotos incríveis do Lysandre no palco e...",
+        nameColor: "#eb7fbc",
+        sprite: "https://i.ibb.co/ymjdBbLf/214-2b72c9cde980a344.png"
+      }, {
+        name: "Nina",
+        text: "O que está acontecendo aqui?",
+        nameColor: "#eb7fbc",
+        sprite: "https://i.ibb.co/cht2Gkgs/212-55913975438e96de.png"
+      }, {
+        name: "Priya",
+        text: "Nada demais, Nina. Como estão as fotos?",
+        nameColor: "#9AFFFF",
+        sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+      }, {
+        name: "Nathaniel",
+        text: "Isa, você está linda hoje.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Nathaniel",
+        text: "Esse vestido combina perfeitamente com você.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/8Lb5Ptz4/61-Sem-T-tulo-20250614095434.png"
+      }, {
+        name: "Castiel",
+        text: "...",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Rosalya",
+        text: "Eu que escolhi! Sabia que ficaria perfeito nela.",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      }, {
+        name: "Castiel",
+        text: "Nossa, que interesse repentino em elogios...",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Nathaniel",
+        text: "Não vejo problema em elogiar quando é merecido.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Isa",
+        text: "(O Castiel está... com ciúmes dos elogios que o Nathaniel está me fazendo?)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Nina",
+        text: "Gente, vocês estão estranhos... Aconteceu alguma coisa?",
+        nameColor: "#eb7fbc",
+        sprite: "https://i.ibb.co/cht2Gkgs/212-55913975438e96de.png"
+      }, {
+        name: "Castiel",
+        text: "Nada que você precise se preocupar.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Nathaniel",
+        text: "Castiel, se tem algo incomodando você, pode falar diretamente.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Isa",
+        text: "(Notas: Finge que ele tá azul, não tem ele azul com essa roupa 🙄)",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Castiel",
+        text: "Pode deixar que quando tiver algo para falar, eu falo.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "(Por que o Castiel está sendo tão hostil? E o Nathaniel não está facilitando...)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Rosalya",
+        text: "Gente, sério?!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Nathaniel",
+        text: "Castiel, se você tem algo contra mim, podemos resolver isso como homens civilizados.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Rosalya",
+        text: "CHEGA!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Isa",
+        text: "(Todos param e olham para Rosa, surpresos com seu tom firme.)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "(Caramba, que voz de 'mãe brava' foi essa? Até o DJ diminuiu o som. Que medo)",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Rosalya",
+        text: "Vocês dois estão agindo como crianças! É a festa de aniversário da Isa e vocês estão aqui medindo força como dois galos briguentos!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Isa",
+        text: "(Rosa está realmente brava... nunca a vi assim)",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Isa",
+        text: "(Meu Deus, por que eu estou com tanta vontade de rir!?)",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Castiel",
+        text: "Ei, eu não comecei...",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Rosalya",
+        text: "NÃO ME INTERESSA quem começou! Vocês estão estragando a festa que passamos SEMANAS organizando!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Nathaniel",
+        text: "Rosalya, você tem razão...",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Rosalya",
+        text: "Claro que eu tenho razão! Olhem ao redor! As pessoas estão parando de dançar para olhar o show de vocês!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Rosalya",
+        text: "Vocês dois vão se comportar AGORA ou eu os expulso da festa eu mesma! E não pensem que estou brincando!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Isa",
+        text: "(Uau. Isso foi... intenso. Rosa acabou de me dar o melhor presente de aniversário: paz.)",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Castiel",
+        text: "Tch... Tá bom. Mas a culpa não é minha se o Sr. Perfeição não sabe a hora de parar.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Isa",
+        text: "(Nathaniel ajeita seu traje e retoma a compostura.)",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Nathaniel",
+        text: "Não tenho intenção de estragar a festa da Isa. Minhas sinceras desculpas, Rosalya. E a você também, Isa.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Rosalya",
+        text: "Ótimo.. Agora, Castiel, vá procurar o Lysandre e certifique-se de que a Nina não o tenha amarrado em um poste. Nathaniel, faça o favor de ir socializar com o resto dos convidados. Longe um do outro!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      }, {
+        name: "Castiel",
+        text: "Certo, certo. Só por você, Isa.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(Ele sai, lançando um último olhar severo para Nathaniel antes de ir em direção ao palco.)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Nathaniel",
+        text: "Nos falamos mais tarde, Isa. E obrigada de novo pelo convite.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Isa",
+        text: "(Nathaniel se afasta, indo conversar com um grupo de pessoas perto da mesa de comes e bebes)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Ufa. Rosalya salvou o dia de um desastre total. E o Castiel... ele realmente estava com ciúmes. Isso é bom, não é?)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+        showChoices14: true
+      }, {
+        name: "Isa",
+        text: "(Priya e Rosalya me puxam gentilmente para longe do centro do salão, onde a música já está voltando a animar)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+        background: "https://i.ibb.co/twVVScjb/image.png"
+      }, {
+        name: "Priya",
+        text: "Mudando de assunto, ainda faltam algumas pessoas que queriam te entregar presentes.",
+        nameColor: "#9AFFFF",
+        sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+      }, {
+        name: "Kentin",
+        text: "Oi, Isa. Feliz aniversário.",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/5W970c4Q/image.png"
+      }, {
+        name: "Kentin",
+        text: "Você está... linda",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/rG8ZPwXK/image.png"
+      }, {
+        name: "Isa",
+        text: "(Ele estende uma pequena caixa que parece ter algo feito à mão)",
+        sprite: "https://i.ibb.co/HLNRNDGk/image.png"
+      }, {
+        name: "Isa",
+        text: "(abrir)",
+        sprite: "https://i.ibb.co/HLNRNDGk/image.png",
+        showGift: true
+      }, {
+        name: "Isa",
+        text: "(É um pequeno chaveiro de soldadinho de chumbo, feito de tecido e costurado com cuidado)",
+        sprite: "https://i.ibb.co/HLNRNDGk/image.png"
+      }, {
+        name: "Kentin",
+        text: "É... é um soldadinho de chumbo para te lembrar que você tem sempre alguém que vai te proteger",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      }, {
+        name: "Rosalya",
+        text: "Aww Isso é a coisa mais doce que eu já vi!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      }, {
+        name: "Isa",
+        text: "(Que presente adorável! O Kentin é mesmo um amor)",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      }, {
+        name: "Isa",
+        text: "Eu adorei, Kentin!",
+        sprite: "https://i.ibb.co/fJ3kMHP/Kentin2-E4.webp"
+      }, {
+        name: "Kentin",
+        text: "Fico feliz que você gostou, você sempre me apoiou",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/ZpmdnCm4/Kentin2-E5.webp"
+      }, {
+        name: "Isa",
+        text: "(Com toda essa confusão, ainda não tive tempo de guardar o caderno do Nathaniel junto dos outros presentes.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Rosalya se inclina em direção a mim)",
+        sprite: "https://i.ibb.co/T2nHy1f/37-Sem-T-tulo-20250109131304.png"
+      }, {
+        name: "Rosalya",
+        text: "Falando em proteção... Você sente que está sendo observada?",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      }, {
+        name: "Isa",
+        text: "Por que você diz isso, Rosa?",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      }, {
+        name: "Rosalya",
+        text: "Seu \"idiota favorito\" está nos encarando como se fossêmos queimar o seu vestido",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      }, {
+        name: "Rosalya",
+        text: "O ciúmes é uma coisa linda de se ver",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      }, {
+        name: "Isa",
+        text: "(Eu vejo Castiel de longe, supervisionando a Nina, mas claramente olhando para nossa direção)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "(Castiel, aparentemente, diz algo para Nina e então caminha, com a mão no bolso, vindo até nós)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "(O Castiel para ao meu lado e diz com a voz baixa)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Castiel",
+        text: "O que é isso na sua mão?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "É o presente do Nathaniel. Não tive tempo de guardar junto com os outros",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Castiel",
+        // use rawHtml to tilt the word "útil"
+        text: 'Claro que é. Algo... <span style="display:inline-block; transform:skewX(-15deg); font-style:normal">"útil"</span>. E esse soldadinho ridículo?',
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png",
+        rawHtml: true
+      }, {
+        name: "Kentin",
+        text: "É um presente de amigo, Castiel. Eu que fiz.",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/MxHQqYq2/Kentin2-E8.webp"
+      }, {
+        name: "Castiel",
+        text: "Você gostou desse... pedaço de pano?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "(Ai, Castiel! Você está sendo infantil!)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png",
+        showChoices15: true
+      },
+
+      // Added dialogue sequence: Castiel revealing the pick and Isa's reactions
+      {
+        name: "Isa",
+        text: "(Castiel, então, saca algo do seu próprio bolso, um item pequeno e que ele parecia estar escondendo.)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Isa",
+        text: "(Ele fala com a voz mais baixa, quase um sussurro)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      }, {
+        name: "Castiel",
+        text: "Eu ainda não terminei de te dar o meu. Porque o meu é só para você, não para esses outros verem",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(Uma caixa de veludo... Meu coração está acelerado!)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(O jeito que ele falou... \"O meu é só para você, não para esses outros verem.\" Castiel nunca se importou com o que os outros pensavam, mas a voz dele está grave, mais baixa, íntima. Isso é sério.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Será que ele vai dizer? Será que ele vai me perguntar, na frente de todo mundo, mas ao mesmo tempo em segredo? \"Você quer ser minha namorada?\" Não, isso é bobagem. Ele diria de um jeito muito mais... \"Castiel\")",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Ele vai abrir. E eu vou ver o que é. Meu rosto deve estar vermelho-fogo, sinto o calor subir até as orelhas. Não consigo respirar direito.)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(Uma... palheta?)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(Não é um anel. Não é um colar. É a palheta dele. Aquela... a que ele usa o tempo todo. A de caveira, que está gasta de tanto tocar. A palheta mais importante do mundo para ele.)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Castiel",
+        text: "É a minha palheta da sorte. Eu não toco sem ela desde que a comprei.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "(Peraí. Eu achei que..)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "(O choque é momentâneo, e uma pequena pontada de... decepção? Não. Expectativa frustrada, sim. Eu realmente achei que ele fosse me pedir em namoro! Que idiota que eu sou)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "(Mas, espera. A palheta dele.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Ele me deu a palheta da sorte dele! Ele nunca deixa ninguém nem tocar nela!)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(É a coisa mais Castiel que ele poderia fazer)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      }, {
+        name: "Isa",
+        text: "(Olho para ele, com a palheta na mão. Ele sorri de canto, aquele sorriso raro e que só ele dá)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Castiel",
+        text: "Se você perder, eu te mato.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+
+      // New entries added per user request: Rosalya brings Isa to socialize and introduces Ane & Sofi
+      {
+        name: "Rosalya",
+        text: "Ok, vocês dois! O momento fofo acabou! Isa, temos que ir socializar! Afinal, é a sua festa!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Isa",
+        text: "(Castiel revira os olhos)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Estraga-prazeres...",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Aliás, suas outras melhores amigas chegaram! Elas estavam me ajudando com uma última surpresinha na mesa principal!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Ane",
+        text: "Feliz aniversário, Isa!",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/ymvF9wMB/image.png"
+      },
+      {
+        name: "Sofi",
+        text: "Feliz aniversárioo!",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Isa",
+        text: "Que bom que vocês vieram! Onde vocês estavam?",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Ane",
+        text: "Estávamos garantindo que os docinhos não acabassem! Mas principalmente, estávamos de olho na movimentação do seu ruivo favorito",
+        sprite: "https://i.ibb.co/chHWDg8t/image.png"
+      },
+      {
+        name: "Castiel",
+        text: "O que foi? Estão me vigiando também?",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png",
+        nameColor: "#ff4d4d"
+      },
+      {
+        name: "Sofi",
+        text: "Alguém tem que garantir que você não assuste os convidados com seu mau humor.",
+        sprite: "https://i.ibb.co/KjqLhXGP/image.png",
+        nameColor: "#FF7F7F"
+      },
+      {
+        name: "Ane",
+        text: "Ah, e a propósito, onde está o Armin?",
+        sprite: "https://i.ibb.co/8gKFgPTh/image.png"
+      },
+      {
+        name: "Ane",
+        text: "Ele disse que tinha umas coisas para me mostrar... no canto da sala de jogos.",
+        sprite: "https://i.ibb.co/chHWDg8t/image.png"
+      },
+      {
+        name: "Isa",
+        text: "A última vez que o vi, ele estava na sala de jogos",
+        sprite: "https://i.ibb.co/ymvF9wMB/image.png"
+      },
+      {
+        name: "Ane",
+        text: "Ótimo! Te vejo em um minuto!",
+        sprite: "https://i.ibb.co/chHWDg8t/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ane se afasta rapidamente, em busca de Armin)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+
+      // New family / sparkle sequence added per request
+      {
+        name: "Isa",
+        text: "(Sofi se volta para mim, pronta para puxar assunto, quando de repente uma nuvem de purpurina parece surgir \"do nada.\")",
+        sprite: "https://i.ibb.co/KjqLhXGP/image.png"
+      },
+      {
+        name: "Tia Agatha",
+        text: "Oh! Minha querida!",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/Zp1JDfT9/image.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Uau, Isa! Sua família é... animada!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/T2nHy1f/37-Sem-T-tulo-20250109131304.png"
+      },
+      {
+        name: "Castiel",
+        text: "Mas que diabos é isso agora? Um show de mágica infantil?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(Tia agatha ignora o sarcasmo e encara Castiel de cima a baixo)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Tia Agatha",
+        text: "E quem é esse \"bad boy\" de liquidação aqui? Hummmm... Deixa eu adivinhar!",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/wrsgzK0M/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Tia Agatha, me olhando com um sorriso malicioso, me pergunta:)",
+        sprite: "https://i.ibb.co/wrsgzK0M/image.png"
+      },
+      {
+        name: "Tia Agatha",
+        text: "Minha querida, como estão os namoradinhos?",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/Zp1JDfT9/image.png"
+      },
+      {
+        name: "Sofi",
+        text: "*ATENÇÃO! Essa cena vem com um vídeo especial, preparado por mim! Vai no zapi que eu te mando!*",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+
+      // New Tia Agatha / Isa sequence and choice trigger
+      {
+        name: "Tia Agatha",
+        text: "Então, querida! É esse o tal do namoradinho que está tirando o seu sono? Ou é aquele loirinho engomado? Porque eu vi um rapaz de cabelo azul ali no canto e fiquei na dúvida...",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/CKhCh6Kr/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Tia, eu acho que esse \"rapaz de cabelo azul\" tem um notícia bem engraçada para te dar...)",
+        sprite: "https://i.ibb.co/CKhCh6Kr/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(E também, por que você tem que falar essas coisas na frente dele?!)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "[escolha]",
+        sprite: "https://i.ibb.co/CKhCh6Kr/image.png",
+        showChoices16: true
+      },
+
+      {
+        name: "Tia Agatha",
+        text: "Cuida bem dela, hein, Rapaz-Problema! Se fizer minha sobrinha chorar, eu transformo essa sua guitarra numa vassoura!",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/CKhCh6Kr/image.png"
+      },
+      {
+        name: "Castiel",
+        text: "Essa mulher é maluca, Isa. De onde ela saiu?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "Desculpa, Castiel... Ela é... única.",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Tia Agatha",
+        text: "Bom, já fiz minha aparição e causei o caos! Toma aqui, querida, um presentinho para ajudar na festa!",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/CKhCh6Kr/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Você ganhou: 200 pa e um chapéu de festa ridículo!)",
+        sprite: "https://i.ibb.co/Zp1JDfT9/image.png"
+      },
+      {
+        name: "Tia Agatha",
+        text: "Tchauzinho!",
+        nameColor: "#FF1493",
+        sprite: "https://i.ibb.co/Zp1JDfT9/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Assim como surgiu, Agatha desaparece na multidão em direção aos cupcakes.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Sofi",
+        text: "Meu Deus, Isa! Ela é icônica. O Castiel ficou sem palavras pela primeira vez na vida!",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Castiel",
+        text: "Sem palavras por medo de ser transformado em sapo. Olha, Isa, sua festa tá ficando perigosa demais pro meu gosto!",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Ah, deixa de drama! Mas ela tem razão em uma coisa: cuida bem da Isa. Agora vem!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      },
+      {
+        name: "Isa",
+        text: "(Castiel me dá um olhar cúmplice, uma mistura de \"sua família é doida\" e \"eu gosto de você mesmo assim\")",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Tenta não deixar sua tia me enfeitiçar até a hora da dança.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ele sai andando, com as mãos nos bolsos, mas consigo perceber que ele está rindo sozinho.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ainda bem que ele levou na esportiva... A Tia Agatha é um furacão, mas pelo menos quebrou o gelo)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+
+      // New sequence: laughter, Sofi comments, toasts, and Ane/Armin banter
+      {
+        name: "Isa",
+        text: "(Assim que Castiel se afasta e a nuvem de purpurina da Tia Agatha assenta, eu, Rosalya e Sofia se entreolhamos. Há um segundo de silêncio, e então nós três caimos na risada)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Isa",
+        text: "(Sofi fala limpando uma lágrima de riso)",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Sofi",
+        text: "Isa, eu juro por tudo... \"Bad boy de liquidação\"? Eu vou tatuar essa frase. Sua tia é o minha nova ídola!",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/KjqLhXGP/image.png"
+      },
+      {
+        name: "Isa",
+        text: "Eu queria cavar um buraco e me enfiar dentro! Ela não tem filtro nenhum! E aquela pergunta dos namoradinhos? Na frente dele?!",
+        sprite: "https://i.ibb.co/KjqLhXGP/image.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Mas vocês viram a reação dele? O Castiel de um ano atrás teria xingado e ido embora. Esse aí? Ele riu, Isa. Ele riu",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Isa",
+        text: "(É verdade... Ele levou na brincadeira. Talvez ele esteja mesmo mudando...)",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Isa",
+        text: "(Sofi pega três bebidas sem álcool de uma bandeja que passava)",
+        sprite: "https://i.ibb.co/KjqLhXGP/image.png"
+      },
+      {
+        name: "Sofi",
+        text: "Um brinde ao Castiel sobrevivendo ao teste da família! Mas vem cá... falando em sobreviventes e desaparecidos... alguém viu a Ane?",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Isa",
+        text: "(É verdade, Já faz um bom tempo que a Ane foi \"resgatar\" o Armin)",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Isa",
+        text: "Ela disse que seria rápido, só ia buscar ele na sala de jogos.",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Ah, \"rápido\". Você sabe como é o Armin. Ele provavelmente mostrou pra ela um... \"cheat code\" novo. Ou talvez eles estejam presos em uma \"cutscene\" que não dá para pular",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      },
+      {
+        name: "Sofi",
+        text: "É, e conhecendo a Ane, ela não está com pressa nenhuma de dar \"Game Over\" nessa partida. Deixa eles!",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      }
+      , {
+        name: "Isa",
+        text: "(Nathaniel toca levemente no ombro da Rosalya)",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      }, {
+        name: "Nathaniel",
+        text: "Desculpe interromper a reunião das meninas, mas... Rosalya, houve algum problema com o buffet?",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Rosalya",
+        text: "Problema? Claro que não, Nath! Por quê?",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/T2nHy1f/37-Sem-T-tulo-20250109131304.png"
+      }, {
+        name: "Nathaniel",
+        text: "Pelo cronograma, o bolo já deveria estar posicionado. Não quero que atrase o parabéns e os convidados comecem a ir embora. Eu posso ir lá na cozinha verificar se...",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/vxkJbvkF/1039-ef7ea3bb23e03e8b.png"
+      }, {
+        name: "Sofi",
+        text: "Não! Quer dizer... não precisa! O bolo está... descansando! É um bolo muito delicado!",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/6cscdF39/image.png"
+      }, {
+        name: "Isa",
+        text: "(Bolo descansando? A Sofi não sabe mentir sob pressão...)",
+        sprite: "https://i.ibb.co/6cscdF39/image.png"
+      }, {
+        name: "Rosalya",
+        text: "Exatamente! É uma questão do tempo certo, Nathaniel. Confie em mim.",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      }, {
+        name: "Nathaniel",
+        text: "Tudo bem. Se você diz. Eu só quero que tudo saia perfeito para você hoje, Isa. Não quero que nada dê errado na sua noite.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/xqhv9DNt/image.png"
+      }, {
+        name: "Isa",
+        text: "(Antes que eu possa responder, uma risada seca vem de trás de Nathaniel)",
+        sprite: "https://i.ibb.co/xqhv9DNt/image.png"
+      }, {
+        name: "Castiel",
+        text: "Incrível. Até numa festa você consegue agir como se estivesse inspecionando o corredor da escola.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Nathaniel",
+        text: "Eu estou garantindo que a Isa tenha a festa que merece, Castiel. Alguém precisa ser responsável aqui.",
+        nameColor: "#daa520",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Isa",
+        text: "(Nota: Ele ta assim 🤦 😨 )",
+        sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+      }, {
+        name: "Castiel",
+        text: "A Isa quer se divertir, não preencher um formulário de satisfação. Você está entediando a aniversariante",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Isa",
+        text: "(Lá vamos nós de novo... Eles não conseguem ficar dois minutos no mesmo espaço sem trocar farpas.)",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Isa",
+        text: "(Castiel se volta para mi e estendende a mão)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Castiel",
+        text: "Vem. Vamos sair de perto desse clima de reunião de grêmio estudantil.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "[escolha]",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png",
+        showChoices17: true
+      },
+      // Start of new sequence after Choice 17
+      {
+        name: "Isa",
+        text: "(O Castiel fala baixinho, no meu ouvido)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Castiel",
+        text: "Tem uma varanda lá fora que está bem mais silenciosa. Quero te dar um momento de paz.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(Castiel me guia até uma varanda lateral, que estava vazia e oferecia uma vista linda das luzes do salão e do céu da tarde)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png",
+        background: "https://i.ibb.co/C5CFFjxB/image.png",
+        startBGM: true
+      }, {
+        name: "Isa",
+        text: "(Ele solta minha mão, mas continua perto)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Castiel",
+        text: "Viu? Sem galos brigando, sem gamers escondidos, sem Nina obcecada. Só a gente",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "Você é terrível! Mas obrigada. Eu precisava disso.",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(Castiel se encosta ao parapeito, olhando para mim)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Castiel",
+        text: "Feliz aniversário, de verdade",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "(Ele dá um passo na minha direção)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Castiel",
+        text: "Você não tem ideia, tem? Você nunca tem ideia do que faz comigo, garotinha.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "(O quê...?)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Castiel",
+        text: "Olha... Eu sei que sou um idiota na maioria das vezes. E eu não sou bom com palavras como o Lysandre, ou com presentes caros como...",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Isa",
+        text: "(O Castiel hesitando? Isso é raro.)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Castiel",
+        text: "Mas, Isa... você é a única pessoa que me faz querer ser menos idiota. A única que me faz querer vir para essas festas de \"gente normal\".",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Castiel",
+        text: "Você me faz sentir... tipo a música que eu quero tocar de novo e de novo",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      }, {
+        name: "Castiel",
+        text: "Eu não sei ser príncipe encantado. Eu vou continuar sendo um idiota, vou continuar reclamando e arrumando briga. Mas... eu quero ser o \"seu\" idiota",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Isa",
+        text: "[ver imagem]",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png",
+        showImageOverlay: true,
+        imageUrl: "https://i.ibb.co/1tWs0tZB/image.png"
+      }, {
+        name: "Isa",
+        text: "(De repente, a porta da varanda se escancara com um estrondo)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+        stopBGM: true,
+        playDoorSlamSFX: true
+      }, {
+        name: "Rosalya",
+        text: "ACHEI VOCÊS! Pelo amor de Deus, parem de se agarrar um minuto!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Castiel",
+        text: "Tch. Maldição, Rosalya!",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Rosalya",
+        text: "Não tenho tempo para a sua TPM, Castiel! Precisamos de Isa no salão! Decidimos fazer alguns jogos!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Isa",
+        text: "(Um jogo? O que será que a Rosa inventou dessa vez?)",
+        sprite: "https://i.ibb.co/LY3YDM2/Rosalya-Baile1.png"
+      }, {
+        name: "Rosalya",
+        text: "Além disso, você precisa voltar e socializar, Isa! Tem um monte de gente que mal conseguiu te dar um \"oi\" decente! Eles estão lá com presentes na mão, esperando pela aniversariante!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/FxHrKML/37-Sem-T-tulo-20250109130802.png"
+      }, {
+        name: "Castiel",
+        text: "Eles que esperem. Ela está ocupada.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      }, {
+        name: "Rosalya",
+        text: "Castiel, a festa não é só para o seu show de ciúmes! É para os amigos dela! A Nina está quase subindo nas costas do Lysandre de tanta euforia, e >você< tem que voltar para supervisionar sua fotógrafa oficial!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Isa",
+        text: "(Ela usou a \"carta Nina\" de novo!)",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      }, {
+        name: "Isa",
+        text: "(Eu sorrio e pego na mão do Castiel)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      }, {
+        name: "Castiel",
+        text: "Certo. Mas você me deve um momento. E sem interrupções da próxima vez.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Agora que a aniversariante finalmente resolveu aparecer...",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png",
+        background: "https://i.ibb.co/Gn8JZdv/3d21764041e4ad2c729d542a328f2cdc.jpg"
+      },
+      {
+        name: "Rosalya",
+        text: "Espera um pouco... Onde estão os concorrentes principais? Eu não vejo o Alexy, nem o Kentin... E cadê a Ane e o Armin?",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      },
+      {
+        name: "Isa",
+        text: "(É verdade! Eles sumiram faz um tempo. A Ane foi atrás do Armin e nunca mais voltou...)",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      },
+      {
+        name: "Castiel",
+        text: "Devem ter fugido. Se eu fosse eles, teria feito o mesmo para escapar dos seus jogos",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Isa, Castiel, venham comigo. Tenho quase certeza de onde eles se \"esconderam\"",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      },
+      {
+        name: "Castiel",
+        text: "Ah, sério? Eu não sou seu lacaio. Não posso ficar aqui, comendo salgadinhos em paz?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Nem pensar! Agora vem!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png"
+      },
+      {
+        name: "Isa",
+        text: "(Só espero que eles não estejam botando fogo no salão..)",
+        sprite: "https://i.ibb.co/b6MBXFr/36-Sem-T-tulo-20250108173159.png "
+      },
+
+      {
+        name: "Isa",
+        text: "(Assim que nos aproximamos da sala de jogos, ouvimos gritos eufóricos e o som acelerado de um clássico Street Fighter II tocando no volume máximo.)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+        background: "https://i.ibb.co/tqBh9yW/87cae154a8df350d88d379b5e1673b7d.jpg",
+        playStreetSFX: true
+      },
+      {
+        name: "Isa",
+        text: "(Nós abrimos a porta e encontramos Ane e Armin sentados, com os corpos curvados e os rostos a centímetros da tela da TV de tubo, controles de fliperama nas mãos, completamente em transe. O Ryu (Armin) estava contra a Chun-Li (Ane), ambos com o último pedaço de vida)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Armin",
+        text: "SHORYUKEN!",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png",
+        playShoryukenSFX: true
+      },
+      {
+        name: "Ane",
+        text: "Não, não, não! Eu apertei o comando certo!!",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/XZgqkXg4/image.png",
+        playChunLiSFX: true
+      },
+      {
+        name: "Armin",
+        text: "Você está muito lenta!",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/xhxf1bM/1055-98aa45c36adb58cd.png"
+      },
+      {
+        name: "Isa",
+        text: "(Na tela, Ryu acerta um gancho, e aparece um gigantesco \"PERFECT\" e a voz diz \"K.O!\")",
+        sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png",
+        playPerfectSFX: true
+      },
+      {
+        name: "Armin",
+        text: "Eu te avisei, gatinha. O mestre dos jogos sempre vence",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/6bg9qcC/46-Sem-T-tulo-20250121111828.png"
+      },
+      {
+        name: "Ane",
+        text: "Você só ganhou porque o botão de soco médio do meu controle que não está respondendo!!",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/XZgqkXg4/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ele se inclina, apoiando a mão na cadeira dela, e sussurra no ouvido dela, baixo o suficiente para que só ela escute)",
+        sprite: "https://i.ibb.co/6bg9qcC/46-Sem-T-tulo-20250121111828.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ane fica completamente muda. Seus olhos se arregalam levemente, e ela leva a mão à nuca, onde o Armin acabou de sussurrar. Ela não consegue formular uma única palavra de resposta, apenas respira fundo)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Ane",
+        text: "É melhor a gente voltar. A Rosalya vai matar a gente.",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/9Hz1NyGW/apaga.webp"
+      },
+      {
+        name: "Isa",
+        text: "(Eles estavam jogando Street Fighter um contra o outro... brigando de mentira e flertando na frente de todo mundo?)",
+        sprite: "https://i.ibb.co/9Hz1NyGW/apaga.webp"
+      },
+      {
+        name: "Castiel",
+        text: "Vocês estão na ponta da cadeira suando por um jogo que tem vinte anos. Pensei que estivessem sendo atacados por abelhas",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      },
+      {
+        name: "Ane",
+        text: "Castiel, você não entende a tensão! Eu tava quase fazendo o Relâmpago",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/XZgqkXg4/image.png"
+      },
+      {
+        name: "Isa",
+        text: "(Armin estava prester a falar, mas é interrompido. Do outro lado da sala, perto da mesa de pebolim, uma batida \"rítmica\" feita com a boca começa a ecoar)",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Isa",
+        text: "(O que... o que eles estão fazendo?)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Alexy",
+        text: "O Kentin, se liga mano, eu tô aprendendo a rimar",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png",
+        playAlexySFX: true
+      },
+      {
+        name: "Kentin",
+        text: "Daora Alexy, mostra aí mano",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/5W970c4Q/image.png"
+      },
+      {
+        name: "Alexy",
+        text: "Mano namoral Kentin, eu quero pegar no seu...",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Kentin",
+        text: "Oh, oh, Alexy! Que que é isso véi?!",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      },
+      {
+        name: "Alexy",
+        text: "O véi foi mal, eu só consigo rimar... assim",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/ypvRSZZ/Emotion-22.png"
+      },
+      {
+        name: "Kentin",
+        text: "Não ó, se liga",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/fJ3kMHP/Kentin2-E4.webp"
+      },
+      {
+        name: "Kentin",
+        text: "Mano você tá ligado que eu chego na minha",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/5W970c4Q/image.png"
+      },
+      {
+        name: "Alexy",
+        text: "Daora",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Kentin",
+        text: "Só não conta pro Evan que eu tô usando calcinha",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/MxHQqYq2/Kentin2-E8.webp"
+      },
+      {
+        name: "Alexy",
+        text: "É disso que eu tô falando",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/ypvRSZZ/Emotion-22.png"
+      },
+      {
+        name: "Alexy",
+        text: "Sempre que eu tô rimando",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+      },
+      {
+        name: "Alexy",
+        text: "Eu só penso em tá te maman...",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Armin",
+        text: "LÁ ELE MIL VEZES!",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/6XGJDHy/45-Sem-T-tulo-20250120191638.png"
+      },
+      {
+        name: "Armin",
+        text: "Mano, por que cês tão fazendo freestyle gay?!",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Kentin",
+        text: "Eu não sei,  Alexy começou e eu meio que peguei..",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/MxHQqYq2/Kentin2-E8.webp"
+      },
+      {
+        name: "Armin",
+        text: "Mas tá de boa, que eu mando improvisado",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png"
+      },
+      {
+        name: "Armin",
+        text: "Eu tive que dar duro  e engolir muita coisa calado",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Armin",
+        text: "Eh... isso foi meio estranho",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/Gf41FjNf/image.png"
+      },
+      {
+        name: "Kentin",
+        text: "Tá vendo? Nóis não consegue parar",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/MxHQqYq2/Kentin2-E8.webp"
+      },
+
+      // New Dialogues (Castiel complaining, Ane comment, etc.)
+      {
+        name: "Castiel",
+        text: "Eu estou cercado de idiotas. \"Engolir muita coisa calado\"? Sério, Armin?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Ane",
+        text: "Acho melhor você ficar nos jogos de luta. O rap não é seu forte...",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/8V2W8nt/image.png"
+      },
+      {
+        name: "Armin",
+        text: "Foi o momento, sabe? A batida me levou",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/Gf41FjNf/image.png"
+      },
+      {
+        name: "Alexy",
+        text: "Ah, qual é, Castiel! Não fica com inveja do nosso flow. Quer entrar na roda? Tenho certeza que você tem rimas... \"profundas\" sobre a Isa",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Castiel",
+        text: "Se você terminar essa frase, Alexy, eu te jogo pela janela",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(Rosalya fala secando os olhos, batendo uma palma seca, retomando a pose de diva organizadora)",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Pessoal! Pessoal! Chega de show particular!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Agora que já resgatamos os fugitivos vamos voltando para o salão! A festa está esperando a aniversariante!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Castiel",
+        text: "Ótimo. Mais diversão obrigatória. Que chatice.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(O Castiel passa o braço pelos meus ombros enquanto somos empurrados para fora)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Se alguém perguntar, eu não conheço esses caras.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "Tarde demais, Castiel. Eles são parte do pacote",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "OK! Temos três opções de jogos para animar a festa",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png",
+        background: "https://i.ibb.co/Gn8JZdv/3d21764041e4ad2c729d542a328f2cdc.jpg"
+      },
+      {
+        name: "Rosalya",
+        text: "Opção 1: O clássico Verdade ou Desafio,",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      },
+      {
+        name: "Alexy",
+        text: "Eu amo! Se for 'desafio', eu quero que o Castiel vista meu casaco por dez minutos!",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Castiel",
+        text: "Nem morto!",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Opção 2: Caça ao Tesouro",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Armin",
+        text: "Caça ao Tesouro? Tipo Zelda? Isso eu topo!",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png"
+      },
+      {
+        name: "Rosalya",
+        text: "E Opção 3, inspirada no... talento vocal que acabamos de presenciar: Uma Batalha de Rima Improvisada!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      },
+      {
+        name: "Kentin",
+        text: "Ah, não! Eu não sou bom nisso!",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      },
+      {
+        name: "Alexy",
+        text: "EU VOTO NA BATALHA DE RIMA!",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Isa",
+        text: "(Parece que a Batalha de Rima está ganhando força. Preciso de um consenso rápido!)",
+        sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+      },
+      {
+        name: "Sofi",
+        text: "O Castiel e o Alexy brigando em rimas seria divertido!",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/Nd8vRsSH/image-removebg-preview.png"
+      },
+      {
+        name: "Ane",
+        text: "Eu voto na rima!",
+        nameColor: "#ADD8E6",
+        sprite: "https://i.ibb.co/ymvF9wMB/image.png"
+      },
+      {
+        name: "Armin",
+        text: "Eu vou na rima, como em Friday Night Funkin!",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Castiel",
+        text: "Tch. Parece que não tenho escolha",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Mas eu escolho o tema: só se for sobre a Isa, o resto é entediante",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(O Castiel quer batalhar sobre mim?!)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Perfeito! Batalha de Rima decidida! Com votação unânime e tema escolhido pelo próprio Castiel!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Isa",
+        text: "(Mas eu nem disse nada!)",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Batalha de Rima Decidida! Preparem-se, competidores! E Isa, seu papel é ser a juíza!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      },
+      {
+        name: "Isa",
+        text: "(Juíza? Interessante)",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      },
+      // New Rap Battle Round 1 Dialogue
+      {
+        name: "Rosalya",
+        text: "Rodada 1! Castiel contra Alexy! Castiel, você começa! Tema: A Isa!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Castiel",
+        text: "Eu fui sarcástico, Isso é ridículo. Eu sou músico, não palhaço de circo",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+      },
+      {
+        name: "Sofi",
+        text: "Vamos lá, Castiel! Ou você tá com medo de perder pro Alexy?",
+        nameColor: "#FF7F7F",
+        sprite: "https://i.ibb.co/KjqLhXGP/image.png"
+      },
+      {
+        name: "Castiel",
+        text: "Medo? Tch. Me poupe.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Alexy",
+        text: "Então prova. Ou vai deixar a Isa achar que você só tem atitude quando tá com a guitarra?",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ele olha para mim, vê que estou esperando, e depois fulmina o Alexy com o olhar)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Tá legal. Me dá essa porcaria de microfone. Mas depois disso, eu vou embora e levo a Isa junto.",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "É assim que se fala! Batalha decidida! Isa, você é a juíza, tente não babar muito no seu ruivo!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/jkdS059/Rosalya-Baile4.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Castiel, você começa! Mostra pro Alexy quem manda!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Isa",
+        text: "(O jeito que ele segura o microfone... Ele parece completamente desacreditado e ofendido por estar fazendo isso. Ele só está aqui porque o Alexy feriu o ego dele)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Eu não sou de rimar... mas hoje abro exceção",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png",
+        playBeatSFX: true
+      },
+      {
+        name: "Castiel",
+        text: "Pra falar da tábua que ganhou meu coração",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Não espera poema meloso, nem carta com cheiro de flor",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Meu presente é te aguentar, vê se da valor",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "O Alexy enfeitou tudo, trouxe bolo e guaraná",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Mas o que você quer mesmo só eu posso te dar",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ele não está mais rimando, está me provocando abertamente na frente de todos!)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      // New Dialogues Added Here
+      {
+        name: "Isa",
+        text: "(Alexy pega o microfone rindo)",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Alexy",
+        text: "Você diz que ela é tábua? Olha o respeito, cabeludinho!",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+      },
+      {
+        name: "Alexy",
+        text: "Hoje é aniversário dela, trate com carinho!",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Alexy",
+        text: "Você \"abre exceção\"? Ah, faz favor, não se gaba",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+      },
+      {
+        name: "Alexy",
+        text: "A gente sabe que por ela, sua postura de mau acaba!",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/8gWssTnT/image.png"
+      },
+      {
+        name: "Alexy",
+        text: "Amiga, ele te ama, mas é duro de admitir",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Alexy",
+        text: "Sorte que você tem a mim pra te fazer rir!",
+        nameColor: "#3f65c6",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+      },
+      {
+        name: "Isa",
+        text: "(O Castiel ri, um riso... sarcástico.)",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "É aniversário dela, e ela sabe o que prefere",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Entre o amigo colorido e o homem que a fere",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Não, pera, que a protege",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Rimar não é meu forte",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Mas... ter ela comigo é a minha maior sorte",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png",
+        stopBeatSFX: true
+      },
+      {
+        name: "Isa",
+        text: "(Ok, isso me ganhou. Ele estava sendo forçado e sarcástico, mas encerrou com uma admissão pública de carinho)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      },
+      {
+        name: "Isa",
+        text: "Olha... O Alexy teve mais ritmo, mas o Castiel terminou com a melhor rima.",
+        sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+      },
+      {
+        name: "Castiel",
+        text: "Isso é um \"eu ganhei\", tábua?",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "Empate técnico! Pela sobrevivência do Alexy!",
+        sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+      },
+      {
+        name: "Isa",
+        text: "(Castiel imediatamente me puxa pelo braço, tentando me arrastar para fora do círculo)",
+        sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+      },
+      {
+        name: "Castiel",
+        text: "Ótimo. Acabou o circo. Vamos embora",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Nananinanão! Alto lá, bad boy! Você pode sair do palco, mas a juíza fica!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      },
+      {
+        name: "Castiel",
+        text: "Tsc. Eu vou estar ali, bebendo algo. Se esse próximo round demorar mais de dois minutos, eu sequestro a aniversariante",
+        nameColor: "#ff4d4d",
+        sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+      },
+      {
+        name: "Isa",
+        text: "(Ele sai pisando duro, mas dá uma piscadela rápida antes de virar as costas)",
+        sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Muito bem! O primeiro round foi tenso, mas agora vamos mudar a frequência!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+      },
+      {
+        name: "Rosalya",
+        text: "De um lado, ele que troca o sol pelo monitor... Armin! E do outro, ele que trocou os cookies por halteres... Kentin!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+      },
+      {
+        name: "Isa",
+        text: "(Armin caminha para o centro fazendo um alongamento nos dedos, como se fosse pegar um controle)",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Rosalya",
+        text: "Round 2! O Gamer vs O Militar! Tema: A Noite do Aniversário! Solta o som, DJ!",
+        nameColor: "#9ca3d6",
+        sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png",
+        playBeatSFX: true
+      },
+      {
+        name: "Armin",
+        text: "Loguei no servidor, a festa tá lagada",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Armin",
+        text: "Mas minha party tá cheia, a missão tá focada",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png"
+      },
+      {
+        name: "Armin",
+        text: "Kentin treina muito, flexão e abdominal",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Armin",
+        text: "Mas no PvP da rima, eu sou o Boss Final",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png"
+      },
+      {
+        name: "Armin",
+        text: "A Isa tá de level up, hoje é o dia dela, E você, soldadinho? Voltou pra novela?",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+      },
+      {
+        name: "Kentin",
+        text: "É... eu treinei muito, parei de chorar, Não sou mais aquele garoto que iam zoar",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      },
+      {
+        name: "Kentin",
+        text: "protejo a Isa, não fico só no jogo, Se mexer com ela, eu... eu taco fogo!",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/MxHQqYq2/Kentin2-E8.webp"
+      },
+      {
+        name: "Kentin",
+        text: "Digo... eu luto!",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      },
+      {
+        name: "Kentin",
+        text: "É, eu luto por ela! E o Armin só ganha se for na tela",
+        nameColor: "#556B2F",
+        sprite: "https://i.ibb.co/HLNRNDGk/image.png"
+      },
+      {
+        name: "Armin",
+        text: "Taca fogo? Calma aí, Charizard",
+        nameColor: "#3D3C6B",
+        sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png",
+        stopBeatSFX: true
+      },
+      {
+        name: "Isa",
+        text: "(O Kentin tadinho! Ele tentou ser agressivo e saiu todo desajeitado. É tão... fofo da parte dele tentar.)",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp"
+      },
+      {
+        name: "Isa",
+        text: "[escolhas]",
+        sprite: "https://i.ibb.co/wN0Z5CbD/Kentin2-E9.webp",
+        showChoices18: true
+      }
+      ];
+
+      const dialoguesKentinWin = [
+        {
+          name: "Isa",
+          text: "Minha decisão é... Vitória do Kentin!",
+          sprite: "https://i.ibb.co/MxHQqYq2/Kentin2-E8.webp"
+        },
+        {
+          name: "Isa",
+          text: "O Armin foi ótimo, mas o Kentin vence pelo esforço de superar a vergonha e pela \"ameaça incendiária\"!",
+          sprite: "https://i.ibb.co/HLNRNDGk/image.png"
+        },
+        {
+          name: "Armin",
+          text: "Justo, justo. Foi um GG WP",
+          nameColor: "#3D3C6B",
+          sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png"
+        },
+        {
+          name: "Ane",
+          text: "Boa escolha, Isa! O Kentin foi super fofo, mereceu demais!",
+          nameColor: "#ADD8E6",
+          sprite: "https://i.ibb.co/chHWDg8t/image.png"
+        }
+      ];
+
+      const dialoguesArminWin = [
+        {
+          name: "Isa",
+          text: "Minha decisão é... Vitória do Armin!",
+          sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+        },
+        {
+          name: "Isa",
+          text: "Não tem como negar, o flow dele foi melhor e as referências foram hilárias! Desculpa, Kentin, mas o XP vai pro Armin hoje. Você mandou muito bem, Armin!",
+          sprite: "https://i.ibb.co/kmPrZ8Q/46-Sem-T-tulo-20250121110123.png"
+        },
+        {
+          name: "Kentin",
+          text: "Tudo bem, tudo bem... ele rimou melhor mesmo",
+          nameColor: "#556B2F",
+          sprite: "https://i.ibb.co/HLNRNDGk/image.png"
+        },
+        {
+          name: "Isa",
+          text: "Arrasou, Armin! Não sabia que você tinha esse talento todo escondid...",
+          sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+        },
+        {
+          name: "Isa",
+          text: "(Antes que eu termine a frase, Ane se coloca rapidamente entre eu e o Armin, abraçando o braço dele com força e estreitando os olhos para mim)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Ane",
+          text: "Obrigada pelos elogios, amiga. Mas pode parar por aí.",
+          nameColor: "#ADD8E6",
+          sprite: "https://i.ibb.co/XZgqkXg4/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Eita! O modo possessivo ativou, ela está me fuzilando!)",
+          sprite: "https://i.ibb.co/XZgqkXg4/image.png"
+        },
+        {
+          name: "Ane",
+          text: "Ele rima bem, joga bem e é um fofo. E é meu Player 2. Exclusivo. Então não precisa ficar tão impressionada com o talento dele, viu? O show acabou. Você já tem a sua rota.",
+          nameColor: "#ADD8E6",
+          sprite: "https://i.ibb.co/gHBb6Mq/image-removebg-preview.png"
+        },
+        {
+          name: "Armin",
+          text: "Sou todo seu, eu juro! Mas deixa eu aproveitar meus quinze minutos de fama!",
+          nameColor: "#3D3C6B",
+          sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+        },
+        {
+          name: "Ane",
+          text: "Quieto! E Isa, foca no seu \"emo\" que já tá te olhando torto ali atrás. Você está na rota do Castiel, lembra?",
+          nameColor: "#ADD8E6",
+          sprite: "https://i.ibb.co/yc27PF0C/image-removebg-preview-1.png"
+        },
+        {
+          name: "Isa",
+          text: "Relaxa, eu já tenho um ruivo ciumento para lidar. O Armin está a salvo!",
+          sprite: "https://i.ibb.co/yc27PF0C/image-removebg-preview-1.png"
+        },
+        {
+          name: "Ane",
+          text: "Ótimo.",
+          nameColor: "#ADD8E6",
+          sprite: "https://i.ibb.co/gHBb6Mq/image-removebg-preview.png"
+        }
+      ];
+      
+      const dialoguesParanoiaIntro = [
+        {
+          name: "Priya",
+          text: "Vocês organizam uma Batalha de Rima épica e ninguém me chama para julgar o flow do Castiel? Que injustiça!",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+        },
+        {
+          name: "Isa",
+          text: "Priya! Você sumiu!",
+          sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+        },
+        {
+          name: "Priya",
+          text: "Estava conversando com a Melody sobre o comitê, mas eu ouvi os gritos do Alexy e do Armin lá da cozinha. Eu perdi alguma coisa importante?",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Alexy",
+          text: "Você perdeu o melhor! O Castiel rimou sobre a Isa! Foi quase um rap de amor!",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+        },
+        {
+          name: "Isa",
+          text: "(O Castiel fala lá do fundo, revirando os olhos)",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Eu não \"rimei\". Eu apenas disse a verdade com um ritmo decente.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Priya",
+          text: "Ah, Castiel. Adoro seu jeito de negar o romantismo",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/fQ58s7D/Priya-Baile3.png"
+        },
+        {
+          name: "Priya",
+          text: "Vocês estão muito barulhentos para serem apenas um jogo de mesa. Pelas expressões, imagino que o Castiel tenha sido forçado a expor os sentimentos dele publicamente, e o Alexy aproveitou a oportunidade para causar. Acertei?",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/Fn5XQR7/Priya-Baile9.png"
+        },
+        {
+          name: "Isa",
+          text: "Priya! Como você sabe de tudo isso só de olhar?",
+          sprite: "https://i.ibb.co/Fn5XQR7/Priya-Baile9.png"
+        },
+        {
+          name: "Priya",
+          text: "O Castiel está com a orelha vermelha e o Alexy está vibrando. É um padrão simples",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Castiel",
+          text: "Você perdeu a chance de ficar quieta.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Rosalya",
+          text: "Castiel, modere seu tom! Priya, que bom que você chegou! Estávamos procurando uma atividade para animar o restante da festa.",
+          nameColor: "#9ca3d6",
+          sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+        },
+        {
+          name: "Priya",
+          text: "Um jogo que funcione para um grupo grande e que seja emocionante... Eu tenho uma ideia.",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+        },
+        {
+          name: "Priya",
+          text: "O nome é Paranoia. Eu aprendi esse jogo quando morei fora, em uma festa de estudantes de psicologia. Ele é simples, mas revela muito sobre as dinâmicas sociais",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Priya",
+          text: "As regras são:",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Priya",
+          text: "Alguém começa e sussurra uma pergunta polêmica ou comprometedora no ouvido de uma pessoa na roda. Exemplo: Quem é o mais atraente da roda? Quem é mais provável de mentir para a namorada? Com quem você ficaria nesta festa, se pudesse?",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+        },
+        {
+          name: "Priya",
+          text: "A pessoa que ouviu a pergunta deve responder apenas o nome da pessoa em voz alta para todos.",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Priya",
+          text: "E é aí que começa a Paranoia. Ninguém, exceto quem perguntou e quem respondeu, sabe qual era a pergunta. A pessoa do nome e todos os outros vão ficar pensando: \"Que diabos de pergunta foi essa para o nome dela ser escolhido?\"",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/Fn5XQR7/Priya-Baile9.png"
+        },
+        {
+          name: "Priya",
+          text: "Se alguém quiser saber a pergunta, precisa se submeter a um desafio que a roda escolher.",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/fQ58s7D/Priya-Baile3.png"
+        },
+        {
+          name: "Isa",
+          text: "(Um jogo importado que expõe os segredos da turma? A Priya é a melhor!)",
+          sprite: "https://i.ibb.co/fQ58s7D/Priya-Baile3.png"
+        },
+        {
+          name: "Castiel",
+          text: "Interessante. Pelo menos a Isa vai ter que se explicar se o nome de algum idiota aparecer.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Rosalya",
+          text: "Perfeito! Paranoia é o jogo! Mas esse jogo é melhor quanto mais pessoas tivermos. Precisamos de todos para aumentar a tensão. Onde estão os outros? Lysandre, Nathaniel, Íris, e o resto da turma?",
+          nameColor: "#9ca3d6",
+          sprite: "https://i.ibb.co/FxHrKML/37-Sem-T-tulo-20250109130802.png"
+        },
+        {
+          name: "Rosalya",
+          text: "Para o Paranoia funcionar, precisamos de todos os participantes! Temos que arrastar todos que estiverem escondidos",
+          nameColor: "#9ca3d6",
+          sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+        },
+        {
+          name: "Isa",
+          text: "(Rosalya decidiu que o jeito era nos dividirmos em equipes de busca. Minha missão era ser rápida para finalmente poder dançar com o Castiel.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(Fiquei na equipe com o Castiel e o Alexy. Fomos encarregados de encontrar o Lysandre, a Íris e qualquer outro aluno escondido pela festa. A única regra, e a mais difícil, era: tentar fazer com que o Castiel não começasse uma briga se cruzássemos com o Nathaniel)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(O som da festa vai se tornando um eco abafado conforme entramos na ala oeste do salão)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+          background: "https://i.ibb.co/FLG4ZWys/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Alexy vai um pouco à frente, parando para olhar cada porta entreaberta)",
+          sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+        },
+        {
+          name: "Alexy",
+          text: "Esse lugar é um labirinto. A Rosalya exagerou no tamanho, não acham? Se eu morasse aqui, precisaria de um GPS só para ir à cozinha.",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+        },
+        {
+          name: "Castiel",
+          text: "...",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(O silêncio entre os dois depois disso é quase ensurdecedor. Eles realmente não têm assunto.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Alexy",
+          text: "Será que a Íris foi para a ala leste? Eu vi que tinha um buffet de frutas por lá mais cedo. Ela não resiste a um morango com chocolate.",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+        },
+        {
+          name: "Castiel",
+          text: "Talvez.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(E foi isso. Uma palavra. O Castiel realmente não vai facilitar a conversa hoje.)",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Continuamos andando por mais alguns metros. Passamos por uma sequência de portas duplas fechadas. O salão parece se estender infinitamente em direção aos jardins.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(Nós dobramos à esquerda do salão e chegamos até as mesas mais afastadas)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(Lá, em uma das mesas mais próximas à parede, vemos o grupo. Íris está sentada com o Thomas ao seu lado)",
+          sprite: "https://i.ibb.co/K1fgBsw/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Kim está em pé, encostada na cadeira vaga)",
+          sprite: "https://i.ibb.co/jrGKcHK/Kim2.png"
+        },
+        {
+          name: "Isa",
+          text: "(E a Violette está com um bloco de desenho aberto sobre a mesa)",
+          sprite: "https://i.ibb.co/TxN7G4Mt/image.png"
+        },
+        {
+          name: "Alexy",
+          text: "Encontramos o esconderijo VIP! Sabia que vocês estariam em algum lugar com essa vibe \"realeza e sossego\"",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+        },
+        {
+          name: "Kim",
+          text: "Se vieram buscar a gente pra voltar pra barulheira, podem dar meia volta. A Íris está cuidando do Thomas aqui e o lugar é bom.",
+          nameColor: "#b9f6ea",
+          sprite: "https://i.ibb.co/59PScRN/Kim3.png"
+        },
+        {
+          name: "Íris",
+          text: "Oi pessoal! O Thomas estava ficando com dor de cabeça, então viemos para cá. Aconteceu alguma coisa importante?",
+          nameColor: "#E7684C",
+          sprite: "https://i.ibb.co/K1fgBsw/image.png"
+        },
+        {
+          name: "Isa",
+          text: "Na verdade, viemos recrutar vocês. A Priya sugeriu um jogo chamado \"Paranoia\" e a Rosalya quer reunir a turma toda",
+          sprite: "https://i.ibb.co/K1fgBsw/image.png"
+        },
+        {
+          name: "Íris",
+          text: "Ah, eu adoraria! Mas... não posso deixar o Thomas sozinho. E levar ele para uma roda de perguntas polêmicas não é uma boa ideia",
+          nameColor: "#E7684C",
+          sprite: "https://i.ibb.co/0pptZX7w/image.png"
+        },
+        {
+          name: "Violette",
+          text: "Eu... eu posso ficar com ele",
+          nameColor: "#d790d4",
+          sprite: "https://i.ibb.co/N2hmhc57/image.png"
+        },
+        {
+          name: "Violette",
+          text: "Eu não quero jogar, e o Thomas parece querer um lugar calmo... Eu tenho lápis de cor e meu sketchbook. Podemos desenhar juntos, se ele quiser.",
+          nameColor: "#d790d4",
+          sprite: "https://i.ibb.co/TxN7G4Mt/image.png"
+        },
+        {
+          name: "Thomas",
+          text: "Eu gosto de desenhar.",
+          nameColor: "#FF4500",
+          sprite: "https://i.ibb.co/rKqPqvN2/image.png"
+        },
+        {
+          name: "Íris",
+          text: "Sério, Vio? Você é um anjo! Thomas, se comporte com a Violette, tá? Eu já volto para te buscar",
+          nameColor: "#E7684C",
+          sprite: "https://i.ibb.co/PZDq02DY/image.png"
+        },
+        {
+          name: "Kim",
+          text: "Eu também vou. Não aguento mais tanto silêncio. Além disso, se tem confusão, quero estar lá para ver",
+          nameColor: "#b9f6ea",
+          sprite: "https://i.ibb.co/jrGKcHK/Kim2.png"
+        },
+        {
+          name: "Alexy",
+          text: "Missão concluída com sucesso! Recrutamos duas!",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+        },
+        {
+          name: "Castiel",
+          text: "Ótimo. Agora vamos logo. Quero ver essa tal \"Paranoia\" acabar antes que o Lysandre resolva mandar a gente procurar o bloco de notas de novo.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Kim",
+          text: "Relaxa, Castiel. Vai ser divertido ver você sendo exposto publicamente",
+          nameColor: "#b9f6ea",
+          sprite: "https://i.ibb.co/jrGKcHK/Kim2.png"
+        },
+        {
+          name: "Isa",
+          text: "(Voltamos para os corredores, agora com um grupo maior. A presença da Kim e da Íris injeta uma energia diferente na caminhada, embora o Castiel mantenha seu ar de tédio.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Alexy",
+          text: "Sabiam que o Castiel teve que fazer um rap de amor para a Isa agora pouco? Foi épico!",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+        },
+        {
+          name: "Íris",
+          text: "Sério? Castiel, você está finalmente assumindo seu lado romântico?",
+          nameColor: "#E7684C",
+          sprite: "https://i.ibb.co/k2qLxLJZ/image.png"
+        },
+        {
+          name: "Castiel",
+          text: "mentira. E eu já disse que não foi um \"rap\". Foi uma observação com rima.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Ele está tentando se manter indiferente, mas sei que ele está gostando da atenção, mesmo que negue.)",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Ao dobrarmos um corredor lateral, nos aproximando da área principal, Castiel diminui o passo e me puxa levemente para o lado, para que os outros sigam na frente.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Castiel",
+          text: "Ei, tábua. Espera aí.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "O que foi, Castiel?",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Esse jogo da Priya... eu sei como essas coisas terminam. Começam com perguntas bobas e terminam com alguém querendo causar confusão.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Se alguém te sussurrar alguma idiotice sobre \"quem você quer beijar\" ou \"quem você acha mais bonito\"... é bom você medir bem as suas palavras.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+        },
+        {
+          name: "Castiel",
+          text: "Eu não quero meu nome na boca de todo mundo se a pergunta for uma palhaçada",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "E muito menos quero ver você dando corda pra esses outros idiotas que estão aqui. Entendeu?",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        },
+        {
+          name: "Isa",
+          text: "Está com medo de eu falar seu nome... ou de que eu NÃO fale?",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Ele solta um riso curto e anasalado, cruzando os braços e desviando o olhar por um instante)",
+          sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Não se gabe tanto, garotinha. Sua auto-estima está perigosamente alta hoje, não acha?",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Eu pouco me importo se você fala meu nome ou não pra essa gente.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Mas experimenta dizer o nome de qualquer outro cara nessa roda... e você vai ter problemas comigo depois, Isa. Entendeu?",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Sinto um arrepio na espinha com o tom de voz dele, mas não vou recuar. Levanto o queixo, mantendo nosso contato visual intenso, e abro um sorriso desafiador.)",
+          sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+        },
+        {
+          name: "Isa",
+          text: "\"Problemas com você\", Castiel? Humm... Considerando que hoje é o meu aniversário, isso soa muito mais como um presente do que como uma ameaça.",
+          sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Um presente? Você realmente não tem filtro, não é, garotinha? Cuidado com o que você deseja... Eu posso ser muito generoso quando decido dar 'atenção' a alguém.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Castiel",
+          text: "Vamos ver se essa sua coragem toda continua quando começarem a sussurrar no seu ouvido. Anda logo, antes que eu resolva te dar esse 'presente' aqui mesmo e a gente perca o início da rodada.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Nós dois apressamos o passo para alcançar o restante do grupo. Alexy, Íris e Kim já estão quase chegando à entrada do salão principal)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(O salão está lindo. Passo o olho pelas mesas e vejo alguns rostos conhecidos.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+          background: "https://i.ibb.co/Gn8JZdv/3d21764041e4ad2c729d542a328f2cdc.jpg"
+        },
+        {
+          name: "Melody",
+          text: "Oi, pessoal! Onde vocês estavam? O Nathaniel comentou que vocês tinham saído para dar uma volta. A festa está ótima, não acham? A trilha sonora está perfeita",
+          nameColor: "#00FFFF",
+          sprite: "https://i.ibb.co/FQD2P3M/image.png"
+        },
+        {
+          name: "Isa",
+          text: "Fomos buscar reforços! A Rosalya e a Priya estão organizando um jogo no centro do salão e precisamos de todo mundo.",
+          sprite: "https://i.ibb.co/FQD2P3M/image.png"
+        },
+        {
+          name: "Melody",
+          text: "Um jogo? Ah, eu topo! É bom para integrar o pessoal.",
+          nameColor: "#00FFFF",
+          sprite: "https://i.ibb.co/FQD2P3M/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Assim que Melody se junta ao grupo, uma figura surge de trás de uma das colunas decoradas, com o celular em mãos e um olhar de quem acabou de descobrir um segredo de estado)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Peggy",
+          text: "Falando em ordens da aniversariante... eu ouvi dizer que o \"esquadrão de busca\" estava tendo momentos bem interessantes nos corredores escuros.",
+          nameColor: "#800080",
+          sprite: "https://i.ibb.co/MxgtwcZw/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Lá vem ela. A Peggy não perde uma oportunidade de farejar fofoca.)",
+          sprite: "https://i.ibb.co/MxgtwcZw/image.png"
+        },
+        {
+          name: "Peggy",
+          text: "Isa, você sumiu por quase vinte minutos. E o Castiel logo atrás. O que exatamente vocês estavam \"buscando\"? Porque eu tenho quase certeza que a Íris estava no lounge o tempo todo.",
+          nameColor: "#800080",
+          sprite: "https://i.ibb.co/mCVVsqFY/image.png"
+        },
+        {
+          name: "Kim",
+          text: "Menos, Peggy. Se quer uma história, foca no jogo que vai começar. Vai ter muito mais o que anotar do que uma caminhada no corredor.",
+          nameColor: "#b9f6ea",
+          sprite: "https://i.ibb.co/59PScRN/Kim3.png"
+        },
+        {
+          name: "Peggy",
+          text: "Um jogo? Que tipo de jogo?",
+          nameColor: "#800080",
+          sprite: "https://i.ibb.co/MxgtwcZw/image.png"
+        },
+        {
+          name: "Isa",
+          text: "A Priya disse que o jogo é justamente para a gente se divertir e... bom, ser sincero.",
+          sprite: "https://i.ibb.co/MxgtwcZw/image.png"
+        },
+        {
+          name: "Peggy",
+          text: "\"Ser sincero\"? Interessante. Muito interessante. Eu jogo.",
+          nameColor: "#800080",
+          sprite: "https://i.ibb.co/mCVVsqFY/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Sinto meu rosto esquentar. O Alexy está me olhando como quem sabe exatamente o que rolou no corredor, e o Castiel parece um cão de guarda ao meu lado.)",
+          sprite: "https://i.ibb.co/8gWssTnT/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Agora com o grupo completo eu, Castiel, Alexy, Íris, Kim, Melody e Peggy  atravessamos o restante do salão. Todos os olhares se voltam para nós conforme nos aproximamos do grande círculo de sofás e pufes que a Rosalya montou.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(O Lysandre já está lá, sentado de forma impecável, parecendo um príncipe em seu trono.)",
+          sprite: "https://i.ibb.co/cvJ07Yd/Lysandre-E36.png"
+        },
+        {
+          name: "Isa",
+          text: "(Nathaniel está no lado oposto, observando a nossa chegada com uma expressão neutra, mas que muda ligeiramente quando vê o Castiel parado tão perto de mim)",
+          sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+        },
+        {
+          name: "Isa",
+          text: "(O Kentin está logo ao lado da mesa de petiscos, seus olhos me acompanham assim que entro no seu campo de visão. Ele parece ter notado meu nervosismo.)",
+          sprite: "https://i.ibb.co/HLNRNDGk/image.png"
+        },
+        {
+          name: "Isa",
+          text: "(Um pouco mais à frente, vejo o Armin. Ele está sentado em um pufe, mas não está sozinho. Ele está rindo de algo que a Ane disse, segurando o console com uma mão enquanto a outra descansa casualmente perto dela.)",
+          sprite: "https://i.ibb.co/H4gwPbm/1058-152fa9c0e0034f9f.png"
+        },
+        {
+          name: "Isa",
+          text: "(Priya está sentada de forma relaxada, observando a nossa aproximação com um sorriso calmo. Ela parece estar apenas esperando o momento certo para começar o jogo.)",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Priya",
+          text: "Agora que as peças principais estão aqui... podemos começar. O jogo é Paranoia. Alguém sussurra para um, esse um diz um nome. Se o nomeado quiser saber o porquê... terá de fazer um desafio.",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/fQ58s7D/Priya-Baile3.png"
+        },
+        {
+          name: "Rosalya",
+          text: "Vamos usar a garrafa. O fundo aponta para quem pergunta, e o gargalo para quem responde!",
+          nameColor: "#9ca3d6",
+          sprite: "https://i.ibb.co/VLNBqQK/Rosalya-Baile2.png"
+        },
+        {
+          name: "Isa",
+          text: "(Priya estica o braço e gira a garrafa com força. O vidro desliza sobre o mármore, refletindo as luzes neon que cortam o salão. O barulho do vidro girando parece preencher o silêncio ansioso do grupo. A garrafa vai parando devagar...)",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Isa",
+          text: "(O fundo aponta para Priya. O gargalo gira mais um pouco e para exatamente na minha direção.)",
+          sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+        },
+        {
+          name: "Alexy",
+          text: "Começou bem! A aniversariante é a primeira vítima!",
+          nameColor: "#3f65c6",
+          sprite: "https://i.ibb.co/Qr418FT/Emotion-20.png"
+        },
+        {
+          name: "Isa",
+          text: "(Sinto um leve frio na barriga. A Priya se aproxima, o perfume dela é sutil e elegante. Ela se inclina e, com um sorrisinho brincalhão, sussurra no meu ouvido.)",
+          sprite: "https://i.ibb.co/fQ58s7D/Priya-Baile3.png"
+        },
+        {
+          name: "Priya",
+          text: "Quem nesta roda você acha que sobreviveria menos tempo em um apocalipse zumbi?",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/HprB3sR/Priya-Baile2.png"
+        },
+        {
+          name: "Isa",
+          text: "(Solto um risinho involuntário. É uma pergunta engraçada, mas que diz muito sobre o que eu penso da agilidade e do atletismo de cada um aqui.)",
+          sprite: "https://i.ibb.co/tJk1b85/Priya-Baile2a.png"
+        },
+        {
+          name: "Castiel",
+          text: "Pela sua cara, a pergunta não foi tão ruim assim. Vai logo, solta o nome.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/C0mFB9g/1044-9331d33063ea335d-1.png"
+        },
+        {
+          name: "Isa",
+          text: "(Eu olho ao redor do círculo, analisando as possibilidades. O Nathaniel e o Kentin estão em ótima forma física, seria impossível eles serem os primeiros a cair. O Castiel também tem resistência de sobra, e o Lysandre, embora viva no próprio mundo, é surpreendentemente ágil quando quer.)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "(Até a Kim e a Priya seriam sobreviventes natas. Eu preciso de alguém que, por falta de atenção ou excesso de drama, acabaria virando lanche de zumbi em cinco minutos...)",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png"
+        },
+        {
+          name: "Isa",
+          text: "[Escolher]",
+          sprite: "https://i.ibb.co/spMmN7YC/49-Sem-T-tulo-20250406063555.png",
+          showChoices19: true
+        }
+      ];
+
+      const choices14 = [{
+        text: "Você é incrível, Rosa!",
+        response: {
+          name: "Rosalya",
+          text: "Alguém tinha que fazer isso, não é? Vamos esquecer isso e aproveitar.",
+          nameColor: "#9ca3d6",
+          sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+        }
+      }, {
+        text: "Isso foi... intenso.",
+        response: {
+          name: "Priya",
+          text: "Às vezes, eles agem como cães e gatos... Mas a Rosa pôs ordem na casa!",
+          nameColor: "#9AFFFF",
+          sprite: "https://i.ibb.co/Fn5XQR7/Priya-Baile9.png"
+        }
+      }, {
+        text: "Sorrir para Rosalya com admiração",
+        response: {
+          name: "Rosalya",
+          text: "Não se preocupe, amiga. Eles se merecem. O importante é que sua festa continue.",
+          nameColor: "#9ca3d6",
+          sprite: "https://i.ibb.co/B6bkBmS/Rosalya-Baile5.png"
+        }
+      }];
+
+      const choices15 = [{
+        text: "Gosto de todos os presentes, Castiel.",
+        response: {
+          name: "Castiel",
+          text: "E do meu, você gostou?",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        }
+      }, {
+        text: "Sim, e acho o soldadinho fofo.",
+        response: {
+          name: "Castiel",
+          text: "Fofo. Essa palavra te define, não ele.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/GvVvLdDR/65-Sem-T-tulo-20250719075450.png"
+        }
+      }, {
+        text: "*Murmurar* Não precisa ficar com ciúmes...",
+        response: {
+          name: "Castiel",
+          text: "Não estou com ciúmes. Só não gosto que esses idiotas fiquem dando presentes... úteis para você.",
+          nameColor: "#ff4d4d",
+          sprite: "https://i.ibb.co/Cv0msc9/1046-4fa606589933c050-1.png"
+        }
+      }];
+
+      const choices16 = [
+        {
+          text: "Tia, menos, por favor!",
+          response: {
+            name: "Agatha",
+            text: "Ah, querida, não seja tímida! Na sua idade eu já tinha três pretendentes!",
+            nameColor: "#FF1493",
+            sprite: "https://i.ibb.co/Zp1JDfT9/image.png"
+          }
+        },
+        {
+          text: "Ele é só meu amigo, tia!",
+          response: {
+            name: "Castiel",
+            text: "Amigo? Sei...",
+            nameColor: "#ff4d4d",
+            sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+          }
+        },
+        {
+          text: "Ficar vermelha e não dizer nada.",
+          response: {
+            name: "Sofi",
+            text: "Acho que o silêncio dela já respondeu, tia Agatha!",
+            nameColor: "#FF7F7F",
+            sprite: "https://i.ibb.co/KjqLhXGP/image.png"
+          }
+        }
+      ];
+
+      const choices17 = [
+        {
+          text: "Castiel, ele só está preocupado comigo.",
+          response: {
+            name: "Castiel",
+            text: "Ele se preocupa demais e vive de menos. Vamos logo.",
+            nameColor: "#ff4d4d",
+            sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+          }
+        },
+        {
+          text: "O que você vai aprontar agora?",
+          response: {
+            name: "Castiel",
+            text: "Algo muito melhor do que discutir o horário do bolo, te garanto.",
+            nameColor: "#ff4d4d",
+            sprite: "https://i.ibb.co/0JZX2Nk/1047-10773900545b8730-1.png"
+          }
+        },
+        {
+          text: "Olhar para Nathaniel com um sorriso de desculpas.",
+          response: {
+            name: "Isa",
+            text: "Obrigada, Nath. Já voltamos.",
+            sprite: "https://i.ibb.co/hxMgkpSp/61-Sem-T-tulo-20250615175830.png"
+          }
+        }
+      ];
+
+      const choices18 = [
+        { text: "A. Vitória de Kentin" },
+        { text: "B. Vitória de Armin" }
+      ];
+
+      const choices19 = [
+        {
+          text: "[A] Escolher o Armin",
+          response: {
+            name: "Isa",
+            text: "O Armin. Com certeza. (Pensamento: Ele provavelmente acharia que tinha vidas extras ou morreria tentando salvar o console.)",
+            sprite: "https://i.ibb.co/GvGTbxZ/46-Sem-T-tulo-20250121110507.png"
+          }
+        },
+        {
+          text: "[B] Escolher a Peggy",
+          response: {
+            name: "Isa",
+            text: "Peggy. Sem nem pensar duas vezes. (Pensamento: Ela seria devorada enquanto tentava conseguir um furo de reportagem sobre a origem do vírus.)",
+            sprite: "https://i.ibb.co/MxgtwcZw/image.png"
+          }
+        },
+        {
+          text: "[C] Escolher o Alexy",
+          response: {
+            name: "Isa",
+            text: "Alexy! Desculpa, mas seria você. (Pensamento: Ele se distrairia tentando dar dicas de moda para o primeiro zumbi que cruzasse o caminho.)",
+            sprite: "https://i.ibb.co/3kB2NwQ/Emotion-19.png"
+          }
+        },
+        {
+          text: "[D] Escolher a Melody",
+          response: {
+            name: "Isa",
+            text: "Acho que a Melody. (Pensamento: Ela ficaria paralisada tentando achar o protocolo oficial de segurança da escola antes de correr.)",
+            sprite: "https://i.ibb.co/FQD2P3M/image.png"
+          }
+        },
+        {
+          text: "[E] Escolher a Íris",
+          response: {
+            name: "Isa",
+            text: "Íris, sinto muito, mas o nome é o seu. (: Ela é tão doce que tentaria fazer amizade com o zumbi e acabaria sendo mordida por pura gentileza.)",
+            sprite: "https://i.ibb.co/k2qLxLJZ/image.png"
+          }
+        }
+      ];
+
+      let currentDialogueIndex = 0;
+      const dialogueBox = document.getElementById('dialogue-box');
+      const characterNameElement = document.getElementById('character-name');
+      const dialogueElement = document.getElementById('dialogue');
+      const characterSprite = document.getElementById('character-sprite');
+      const choicesContainer = document.getElementById('choices-container');
+
+      function showDialogue(dialogue) {
+        characterNameElement.textContent = dialogue.name;
+        if (dialogue.rawHtml) {
+          dialogueElement.innerHTML = dialogue.text;
+        } else {
+          dialogueElement.textContent = dialogue.text;
+        }
+        if (dialogue.nameColor) {
+          characterNameElement.style.color = dialogue.nameColor;
+        } else {
+          characterNameElement.style.color = '#9370DB';
+        }
+        if (!dialogue.keepSprite) {
+          characterSprite.src = dialogue.sprite || '';
+        }
+        if (dialogue.background) {
+          document.body.style.backgroundImage = `url('${dialogue.background}')`;
+        }
+        
+        if (dialogue.startBGM) {
+          bgmPlayer.play().catch(e => console.log('BGM playback failed:', e));
+        }
+
+        if (dialogue.stopBGM) {
+          try {
+            bgmPlayer.pause();
+            bgmPlayer.currentTime = 0;
+          } catch (e) {
+            console.log('Failed to stop BGM:', e);
+          }
+        }
+
+        if (dialogue.playDoorSlamSFX) {
+          doorSlamSFX.currentTime = 0; 
+          doorSlamSFX.play().catch(e => console.log('SFX playback failed:', e));
+        }
+
+        if (dialogue.playStreetSFX) {
+          try {
+            streetFightSFX.currentTime = 0;
+            streetFightSFX.play().catch(e => console.log('Street SFX playback failed:', e));
+          } catch (e) {
+            console.log('Failed to play streetFightSFX:', e);
+          }
+        }
+
+        if (dialogue.playPerfectSFX) {
+          try {
+            perfectSFX.currentTime = 0;
+            perfectSFX.play().catch(e => console.log('Perfect SFX playback failed:', e));
+          } catch (e) {
+            console.log('Failed to play perfectSFX:', e);
+          }
+        }
+
+        if (dialogue.playShoryukenSFX) {
+          try {
+            shoryukenSFX.currentTime = 0;
+            shoryukenSFX.play().catch(e => console.log('Shoryuken SFX playback failed:', e));
+          } catch (e) {
+            console.log('Failed to play shoryukenSFX:', e);
+          }
+        }
+
+        if (dialogue.playChunLiSFX) {
+          try {
+            chunLiSFX.currentTime = 0;
+            chunLiSFX.play().catch(e => console.log('Chun-Li SFX playback failed:', e));
+          } catch (e) {
+            console.log('Failed to play chunLiSFX:', e);
+          }
+        }
+
+        if (dialogue.playAlexySFX) {
+          try {
+            alexySFX.currentTime = 0;
+            alexySFX.play().catch(e => console.log('Alexy SFX playback failed:', e));
+          } catch (e) {
+            console.log('Failed to play alexySFX:', e);
+          }
+        }
+
+        if (dialogue.playBeatSFX) {
+          try {
+            beatSFX.currentTime = 0;
+            beatSFX.play().catch(e => console.log('Beat SFX playback failed:', e));
+          } catch (e) {
+            console.log('Failed to play beatSFX:', e);
+          }
+        }
+
+        if (dialogue.stopBeatSFX) {
+          try {
+            beatSFX.pause();
+            beatSFX.currentTime = 0;
+          } catch (e) {
+            console.log('Failed to stop beatSFX:', e);
+          }
+        }
+        
+        if (dialogue.showChoices14) {
+          showChoices14();
+        }
+        if (dialogue.showChoices15) {
+          showChoices15();
+        }
+        if (dialogue.showChoices16) {
+          showChoices16();
+        }
+        if (dialogue.showChoices17) {
+          showChoices17();
+        }
+        if (dialogue.showChoices18) {
+          showChoices18();
+        }
+        if (dialogue.showChoices19) {
+          showChoices19();
+        }
+        
+        if (dialogue.showImageOverlay) {
+          const overlay = document.createElement('div');
+          overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          `;
+          const imageContainer = document.createElement('div');
+          imageContainer.style.position = 'relative';
+          const img = document.createElement('img');
+          img.src = dialogue.imageUrl;
+          img.style.cssText = `
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 10px;
+          `;
+          const closeBtn = document.createElement('button');
+          closeBtn.innerHTML = '&#xd7;';
+          closeBtn.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 2001;
+            padding: 5px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+          `;
+          closeBtn.onclick = () => {
+            document.body.removeChild(overlay);
+          };
+          imageContainer.appendChild(img);
+          imageContainer.appendChild(closeBtn);
+          overlay.appendChild(imageContainer);
+          document.body.appendChild(overlay);
+        }
+        
+        if (dialogue.showGift) {
+          const giftOverlay = document.getElementById('gift-overlay');
+          const giftBox = document.getElementById('gift-box');
+          const giftImage = document.getElementById('gift-image');
+          giftOverlay.style.display = 'flex';
+          giftBox.style.display = 'block';
+          giftBox.onclick = () => {
+            giftBox.style.display = 'none';
+            giftImage.style.display = 'block';
+            giftImage.src = 'https://i.ibb.co/bRdgd00R/image.png';
+          };
+          const closeButton = document.querySelector('#gift-overlay #close-button');
+          closeButton.onclick = () => {
+            giftOverlay.style.display = 'none';
+            giftBox.style.display = 'none';
+            giftImage.style.display = 'none';
+          };
+        }
+      }
+
+      function showResponse(response) {
+        characterNameElement.textContent = response.name;
+        dialogueElement.textContent = response.text;
+        characterNameElement.style.color = response.nameColor;
+        characterSprite.src = response.sprite;
+      }
+
+      function advanceDialogue() {
+        if (currentDialogueIndex < kitchenDialogues.length) {
+          showDialogue(kitchenDialogues[currentDialogueIndex]);
+          currentDialogueIndex++;
+        }
+      }
+
+      function showChoices14() {
+        dialogueBox.style.display = 'none';
+        choicesContainer.style.display = 'flex';
+        choicesContainer.innerHTML = '';
+        choices14.forEach((choice, index) => {
+          const button = document.createElement('button');
+          button.className = 'choice-btn';
+          button.textContent = choice.text;
+          button.onclick = () => handleChoice14(index);
+          choicesContainer.appendChild(button);
+        });
+      }
+
+      function handleChoice14(choiceIndex) {
+        choicesContainer.style.display = 'none';
+        dialogueBox.style.display = 'block';
+        const response = choices14[choiceIndex].response;
+        showResponse(response);
+      }
+
+      function showChoices15() {
+        dialogueBox.style.display = 'none';
+        choicesContainer.style.display = 'flex';
+        choicesContainer.innerHTML = '';
+        choices15.forEach((choice, index) => {
+          const button = document.createElement('button');
+          button.className = 'choice-btn';
+          button.textContent = choice.text;
+          button.onclick = () => handleChoice15(index);
+          choicesContainer.appendChild(button);
+        });
+      }
+
+      function handleChoice15(choiceIndex) {
+        choicesContainer.style.display = 'none';
+        dialogueBox.style.display = 'block';
+        const response = choices15[choiceIndex].response;
+        showResponse(response);
+      }
+
+      function showChoices16() {
+        dialogueBox.style.display = 'none';
+        choicesContainer.style.display = 'flex';
+        choicesContainer.innerHTML = '';
+        choices16.forEach((choice, index) => {
+          const button = document.createElement('button');
+          button.className = 'choice-btn';
+          button.textContent = choice.text;
+          button.onclick = () => handleChoice16(index);
+          choicesContainer.appendChild(button);
+        });
+      }
+
+      function handleChoice16(choiceIndex) {
+        choicesContainer.style.display = 'none';
+        dialogueBox.style.display = 'block';
+        const response = choices16[choiceIndex].response;
+        showResponse(response);
+      }
+
+      function showChoices17() {
+        dialogueBox.style.display = 'none';
+        choicesContainer.style.display = 'flex';
+        choicesContainer.innerHTML = '';
+        choices17.forEach((choice, index) => {
+          const button = document.createElement('button');
+          button.className = 'choice-btn';
+          button.textContent = choice.text;
+          button.onclick = () => handleChoice17(index);
+          choicesContainer.appendChild(button);
+        });
+      }
+
+      function handleChoice17(choiceIndex) {
+        choicesContainer.style.display = 'none';
+        dialogueBox.style.display = 'block';
+        const response = choices17[choiceIndex].response;
+        showResponse(response);
+      }
+      
+      function showChoices18() {
+        dialogueBox.style.display = 'none';
+        choicesContainer.style.display = 'flex';
+        choicesContainer.innerHTML = '';
+        choices18.forEach((choice, index) => {
+          const button = document.createElement('button');
+          button.className = 'choice-btn';
+          button.textContent = choice.text;
+          button.onclick = (e) => {
+            e.stopPropagation();
+            handleChoice18(index);
+          };
+          choicesContainer.appendChild(button);
+        });
+      }
+
+      function handleChoice18(choiceIndex) {
+        choicesContainer.style.display = 'none';
+        let selectedDialogues = [];
+        if (choiceIndex === 0) { 
+           selectedDialogues = dialoguesKentinWin;
+        } else { 
+           selectedDialogues = dialoguesArminWin;
+        }
+        kitchenDialogues.push(...selectedDialogues);
+        kitchenDialogues.push(...dialoguesParanoiaIntro);
+        setTimeout(() => {
+          dialogueBox.style.display = 'block';
+          advanceDialogue();
+        }, 50);
+      }
+
+      function showChoices19() {
+        dialogueBox.style.display = 'none';
+        choicesContainer.style.display = 'flex';
+        choicesContainer.innerHTML = '';
+        choices19.forEach((choice, index) => {
+          const button = document.createElement('button');
+          button.className = 'choice-btn';
+          button.textContent = choice.text;
+          button.onclick = (e) => {
+            e.stopPropagation();
+            handleChoice19(index);
+          };
+          choicesContainer.appendChild(button);
+        });
+      }
+
+      function handleChoice19(choiceIndex) {
+        choicesContainer.style.display = 'none';
+        dialogueBox.style.display = 'block';
+        const response = choices19[choiceIndex].response;
+        showResponse(response);
+      }
+
+      dialogueBox.addEventListener('click', advanceDialogue);
+      advanceDialogue();
+    });
+  </script>
+</head>
+<body>
+  <div id="game-container">
+    <img id="character-sprite" alt="character">
+    <div id="dialogue-box">
+      <div id="character-name"></div>
+      <div id="dialogue"></div>
+    </div>
+    <div id="choices-container"></div>
+  </div>
+
+  <div id="gift-overlay">
+    <div class="gift-container">
+      <button id="close-button">&#xd7;</button>
+      <div id="gift-box"></div>
+      <img id="gift-image" src="https://i.ibb.co/x700PvK/OIG1.jpg" alt="Gift">
+    </div>
+  </div>
+
+  <div id="letter-overlay">
+    <div id="letter-content">
+      Para minha melhor amiga Isa!
+
+      Preparei uma cole&#xe7;&#xe3;o de roupas INCR&#xcd;VEL para voc&#xea;!
+
+      S&#xe3;o pe&#xe7;as super coloridas e estilosas que eu mesmo escolhi pensando no seu estilo &#xfa;nico. Tem at&#xeate; algumas pe&#xe7;as combinando com as minhas!
+
+      E o melhor: vamos fazer um desfile de moda particular depois! Vai ser T&#xc3;O divertido!
+
+      Afinal, ningu&#xe9;m entende mais de moda e estilo do que eu!
+
+      Com muito estilo, Alexy &#x1f499;
+      <button id="close-button" style="position: absolute; top: 10px; right: 10px;">&#xd7;</button>
+    </div>
+  </div>
+</body>
+</html>
